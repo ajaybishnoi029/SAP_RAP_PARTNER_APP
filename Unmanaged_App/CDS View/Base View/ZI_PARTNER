@@ -1,0 +1,14 @@
+@AccessControl.authorizationCheck: #NOT_REQUIRED
+@EndUserText.label: 'ROOT ENTITY FOR PARTNER'
+@Metadata.ignorePropagatedAnnotations: true
+define root view entity zI_partner
+  as select from zab_partner
+{
+  key partner      as Partner,
+      name         as Name,
+      phone_number as PhoneNumber,
+      street       as Street,
+      city         as City,
+      country_code as CountryCode,
+      pay_curr     as PayCurr
+}
