@@ -1,0 +1,18 @@
+@AccessControl.authorizationCheck: #NOT_REQUIRED
+@EndUserText.label: 'COUNTRY SEARCH HELP CUSTOM'
+@Search.searchable: true
+@ObjectModel.resultSet.sizeCategory: #XS            // Field directly becomes a dropdown element
+define view entity ZAB_C_CountryVH
+  as select from I_Country
+{
+      @Search.defaultSearchElement: true
+      @Search.fuzzinessThreshold: 0.8
+      @Search.ranking: #HIGH
+      @ObjectModel.text.element: [ 'Description' ]         // To Display Help Text
+  key Country,
+      @Semantics.text: true
+      @Search.defaultSearchElement: true
+      @Search.fuzzinessThreshold: 0.8
+      @Search.ranking: #LOW
+      _Text[1: Language = $session.system_language].CountryName as Description
+}
