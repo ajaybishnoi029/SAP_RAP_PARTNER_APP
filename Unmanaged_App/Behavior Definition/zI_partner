@@ -1,0 +1,31 @@
+managed implementation in class zbp_i_partner unique;
+strict ( 2 );
+
+define behavior for zI_partner alias Partner
+implementation in class zbp_i_partner unique
+persistent table zab_partner
+lock master
+authorization master ( instance )
+//etag master <field_name>
+{
+  create ( authorization : global );
+  update;
+  delete;
+  //  field ( readonly ) Partner;
+  validation validateKeyIsFilled on save { create; }
+  validation validateFieldData on save { field CountryCode, PayCurr; }
+
+  action fillEmptyCountry;                  // Initially inactive and Active When Records Selected  -- Action Added to Create A button
+  static action clearAllEmptyStreets;       // Always active and not dependent on a selected data record.
+
+  mapping for zab_partner
+    {
+      Partner     = partner;
+      Name        = name;
+      PhoneNumber = phone_number;
+      Street      = street;
+      City        = city;
+      CountryCode = country_code;
+      PayCurr     = pay_curr;
+    }
+}
