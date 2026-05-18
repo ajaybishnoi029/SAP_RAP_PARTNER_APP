@@ -1,0 +1,11 @@
+projection;
+strict ( 2 );
+
+define behavior for zc_partner alias Partner
+{
+  use create;
+  use update;
+  use delete;
+  use action fillEmptyCountry;
+  use action clearAllEmptyStreets;
+}
