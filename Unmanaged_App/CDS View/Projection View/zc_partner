@@ -1,0 +1,15 @@
+@AccessControl.authorizationCheck: #NOT_REQUIRED
+@EndUserText.label: 'PROJECTION VIEW FOR PARTNER'
+@Metadata.allowExtensions: true
+define root view entity zc_partner
+  provider contract transactional_query
+  as projection on zI_partner
+{
+  key Partner,
+      Name,
+      PhoneNumber,
+      Street,
+      City,
+      CountryCode,
+      PayCurr
+}
