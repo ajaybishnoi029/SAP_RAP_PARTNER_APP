@@ -1,0 +1,163 @@
+-- In Local ------------------
+CLASS lhc_Partner DEFINITION INHERITING FROM cl_abap_behavior_handler.
+  PRIVATE SECTION.
+
+    METHODS get_instance_authorizations FOR INSTANCE AUTHORIZATION
+      IMPORTING keys REQUEST requested_authorizations FOR Partner RESULT result.
+
+    METHODS get_global_authorizations FOR GLOBAL AUTHORIZATION
+      IMPORTING REQUEST requested_authorizations FOR Partner RESULT result.
+
+    METHODS validateKeyIsFilled FOR VALIDATE ON SAVE            " For Check Key Field is not initial
+      IMPORTING keys FOR Partner~validateKeyIsFilled.
+
+    METHODS validateFieldData FOR VALIDATE ON SAVE              " For Check Field Level Data
+      IMPORTING keys FOR Partner~validateFieldData.
+
+
+    METHODS fillEmptyCountry FOR MODIFY                          " For Action Fill If country is empty
+      IMPORTING keys FOR ACTION Partner~fillEmptyCountry.
+    METHODS clearAllEmptyStreets FOR MODIFY
+      IMPORTING keys FOR ACTION Partner~clearAllEmptyStreets.
+
+
+
+ENDCLASS.
+
+CLASS lhc_Partner IMPLEMENTATION.
+
+  METHOD get_instance_authorizations.
+  ENDMETHOD.
+
+  METHOD get_global_authorizations.
+  ENDMETHOD.
+
+  METHOD validateKeyIsFilled.
+
+    LOOP AT keys INTO DATA(ls_key) WHERE Partner IS INITIAL.
+      INSERT VALUE #( Partner = ls_key-Partner ) INTO TABLE failed-partner.
+
+      INSERT VALUE #(
+        Partner = ls_key-Partner
+         %msg = new_message_with_text( severity = if_abap_behv_message=>severity-error text = 'PartnerNumber is mandatory BY AJAY' )
+      ) INTO TABLE reported-partner.
+    ENDLOOP.
+
+  ENDMETHOD.
+
+  METHOD validateFieldData.
+
+
+    READ ENTITIES OF zI_partner IN LOCAL MODE               " Getting Data
+        ENTITY Partner
+        FIELDS ( CountryCode PayCurr )
+        WITH CORRESPONDING #( keys )
+        RESULT DATA(lt_partner_data)
+        FAILED DATA(ls_failed)
+        REPORTED DATA(ls_reported).
+
+    LOOP AT lt_partner_data INTO DATA(ls_pdata).
+
+      SELECT SINGLE FROM I_Country                            " Check Country Code
+      FIELDS Country , CountryThreeDigitISOCode
+      WHERE Country = @ls_pdata-CountryCode
+      INTO @DATA(ld_found_country).
+      IF sy-subrc <> 0.
+
+        INSERT VALUE #( Partner = ls_pdata-Partner  ) INTO TABLE failed-partner.
+        INSERT VALUE #(
+            partner = ls_pdata-Partner
+            %msg = new_message_with_text(
+                     severity = if_abap_behv_message=>severity-error
+                     text     = 'Country Code is not correct'
+                   )
+        ) INTO TABLE reported-partner.
+
+      ENDIF.
+
+      SELECT SINGLE FROM I_Currency                                 " Check Currency Code
+        FIELDS Currency, AlternativeCurrencyKey
+        WHERE Currency = @ls_pdata-PayCurr
+        INTO @DATA(ld_found_currency).
+      IF sy-subrc <> 0.
+
+        INSERT VALUE #( Partner = ls_pdata-Partner  ) INTO TABLE failed-partner.
+        INSERT VALUE #(
+            partner = ls_pdata-Partner
+            %msg = new_message_with_text(
+                     severity = if_abap_behv_message=>severity-error
+                     text     = 'Currency Code is not correct'
+                   )
+        ) INTO TABLE reported-partner.
+      ELSE.
+        IF ld_found_country IS NOT INITIAL.
+          IF  ld_found_country-CountryThreeDigitISOCode <>  ld_found_currency-AlternativeCurrencyKey .
+            INSERT VALUE #( Partner = ls_pdata-Partner  ) INTO TABLE failed-partner.
+            INSERT VALUE #(
+                partner = ls_pdata-Partner
+                %msg = new_message_with_text(
+                         severity = if_abap_behv_message=>severity-error
+                         text     = |This Currency Code is not match for Country { ld_found_country-Country } |
+                       )
+            ) INTO TABLE reported-partner.
+
+          ENDIF.
+        ENDIF.
+      ENDIF.
+
+    ENDLOOP.
+
+
+
+  ENDMETHOD.
+
+  METHOD fillEmptyCountry.
+
+    READ ENTITIES OF zI_partner IN LOCAL MODE               " Getting Data
+     ENTITY Partner
+     FIELDS ( Partner )
+     WITH CORRESPONDING #( keys )
+     RESULT DATA(lt_partner_data1)
+     FAILED DATA(ls_failed1)
+     REPORTED DATA(ls_reported1).
+
+    LOOP AT   lt_partner_data1 INTO DATA(ls_pdata1) WHERE Partner IS NOT INITIAL  .
+      INSERT VALUE #(
+             partner = ls_pdata1-Partner
+             %msg = new_message_with_text(
+                      severity = if_abap_behv_message=>severity-success
+                      text     = |Clicked on Fill Button :)|
+                    )
+         ) INTO TABLE reported-partner.
+       INSERT VALUE #(
+             partner = ls_pdata1-Partner
+             %msg = new_message_with_text(
+                      severity = if_abap_behv_message=>severity-success
+                      text     = |Test Line 2|
+                    )
+         ) INTO TABLE reported-partner.
+    ENDLOOP.
+  ENDMETHOD.
+
+  METHOD clearAllEmptyStreets.
+
+    READ ENTITIES OF zI_partner IN LOCAL MODE               " Getting Data
+       ENTITY Partner
+       FIELDS ( Partner Name )
+       WITH CORRESPONDING #( keys )
+       RESULT DATA(lt_partner_data1)
+       FAILED DATA(ls_failed1)
+       REPORTED DATA(ls_reported1).
+
+      INSERT VALUE #(
+             partner = '1'
+             %msg = new_message_with_text(
+                      severity = if_abap_behv_message=>severity-warning
+                      text     = |Clicked on Clear All Button|
+                    )
+         ) INTO TABLE reported-partner.
+
+
+  ENDMETHOD.
+
+ENDCLASS.
