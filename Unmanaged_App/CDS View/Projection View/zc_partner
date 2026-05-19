@@ -13,3 +13,4 @@ define root view entity zc_partner
       CountryCode,
       PayCurr
 }
+ 
