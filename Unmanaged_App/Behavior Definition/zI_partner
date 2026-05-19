@@ -15,8 +15,11 @@ authorization master ( instance )
   validation validateKeyIsFilled on save { create; }
   validation validateFieldData on save { field CountryCode, PayCurr; }
 
-  action fillEmptyCountry;                  // Initially inactive and Active When Records Selected  -- Action Added to Create A button
+  action fillEmptyCountry;                  // Initially inactive and Active When Records Selected
+
   static action clearAllEmptyStreets;       // Always active and not dependent on a selected data record.
+
+  static action withpopup parameter ZAB_i_POPUPENTITY ;     // Popup With Paramter( Abstract CDS View)
 
   mapping for zab_partner
     {
