@@ -1,4 +1,3 @@
--- In Local ------------------
 CLASS lhc_Partner DEFINITION INHERITING FROM cl_abap_behavior_handler.
   PRIVATE SECTION.
 
@@ -14,11 +13,13 @@ CLASS lhc_Partner DEFINITION INHERITING FROM cl_abap_behavior_handler.
     METHODS validateFieldData FOR VALIDATE ON SAVE              " For Check Field Level Data
       IMPORTING keys FOR Partner~validateFieldData.
 
-
     METHODS fillEmptyCountry FOR MODIFY                          " For Action Fill If country is empty
       IMPORTING keys FOR ACTION Partner~fillEmptyCountry.
+
     METHODS clearAllEmptyStreets FOR MODIFY
       IMPORTING keys FOR ACTION Partner~clearAllEmptyStreets.
+    METHODS withpopup FOR MODIFY
+      IMPORTING keys FOR ACTION Partner~withpopup.
 
 
 
@@ -126,16 +127,16 @@ CLASS lhc_Partner IMPLEMENTATION.
              partner = ls_pdata1-Partner
              %msg = new_message_with_text(
                       severity = if_abap_behv_message=>severity-success
-                      text     = |Clicked on Fill Button :)|
+                      text     = |I Know You Clicked on Fill Button :)|
                     )
          ) INTO TABLE reported-partner.
-       INSERT VALUE #(
-             partner = ls_pdata1-Partner
-             %msg = new_message_with_text(
-                      severity = if_abap_behv_message=>severity-success
-                      text     = |Test Line 2|
-                    )
-         ) INTO TABLE reported-partner.
+      INSERT VALUE #(
+            partner = ls_pdata1-Partner
+            %msg = new_message_with_text(
+                     severity = if_abap_behv_message=>severity-success
+                     text     = |Test|
+                   )
+        ) INTO TABLE reported-partner.
     ENDLOOP.
   ENDMETHOD.
 
@@ -149,13 +150,70 @@ CLASS lhc_Partner IMPLEMENTATION.
        FAILED DATA(ls_failed1)
        REPORTED DATA(ls_reported1).
 
+*    LOOP AT   lt_partner_data1 INTO DATA(ls_pdata1).
+    INSERT VALUE #(
+           partner = '1'
+           %msg = new_message_with_text(
+                    severity = if_abap_behv_message=>severity-warning
+                    text     = |Not Good, I Know You Clicked on Clear All Button :(|
+                  )
+       ) INTO TABLE reported-partner.
+*    ENDLOOP.
+
+  ENDMETHOD.
+
+  METHOD withpopup.
+
+    DATA(ls_keys) = keys[ 1 ].
+
+    DATA: it_partner_popup TYPE TABLE FOR CREATE zi_Partner.
+
+
+    it_partner_popup = VALUE #(
+    (
+    %cid = ls_keys-%cid
+    Partner =  ls_keys-%param-partner
+    Name = ls_keys-%param-name
+    PhoneNumber = ls_keys-%param-phone_number
+    Street = ls_keys-%param-street
+    city = ls_keys-%param-city
+    CountryCode = ls_keys-%param-country_code
+    PayCurr = ls_keys-%param-pay_curr
+    %control-Partner = if_abap_behv=>mk-on
+    %control-Name = if_abap_behv=>mk-on
+    %control-PhoneNumber = if_abap_behv=>mk-on
+    %control-Street = if_abap_behv=>mk-on
+    %control-city = if_abap_behv=>mk-on
+    %control-CountryCode = if_abap_behv=>mk-on
+    %control-PayCurr = if_abap_behv=>mk-on
+    )
+       ) .
+
+  MODIFY ENTITIES OF zi_Partner ENTITY Partner
+  CREATE FROM it_partner_popup
+  FAILED DATA(ls_failed_ins)
+  MAPPED DATA(ls_mapped_ins)
+  REPORTED DATA(ls_reported_ins).
+
+    IF ls_mapped_ins IS NOT INITIAL.
       INSERT VALUE #(
              partner = '1'
              %msg = new_message_with_text(
-                      severity = if_abap_behv_message=>severity-warning
-                      text     = |Clicked on Clear All Button|
+                      severity = if_abap_behv_message=>severity-success
+                      text     = |Congrats, Partner Created :)|
                     )
          ) INTO TABLE reported-partner.
+    ENDIF.
+
+    IF ls_failed_ins IS NOT INITIAL.
+      INSERT VALUE #(
+             partner = '1'
+             %msg = new_message_with_text(
+                      severity = if_abap_behv_message=>severity-error
+                      text     = |Entry Already Exist|
+                    )
+         ) INTO TABLE reported-partner.
+    ENDIF.
 
 
   ENDMETHOD.
