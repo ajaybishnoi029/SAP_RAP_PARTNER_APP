@@ -5,12 +5,13 @@
 @AbapCatalog.dataMaintenance : #RESTRICTED
 define table zab_partner {
 
-  key partner  : int4 not null;
-  name         : char13;
-  phone_number : /dmo/phone_number;
-  street       : char13;
-  city         : /dmo/city;
-  country_code : land1;
-  pay_curr     : /dmo/currency_code;
+  key partner     : int4 not null;
+  name            : char13;
+  phone_number    : /dmo/phone_number;
+  street          : char13;
+  city            : /dmo/city;
+  country_code    : land1;
+  pay_curr        : /dmo/currency_code;
+  last_changed_at : timestampl;
 
 }
