@@ -1,0 +1,19 @@
+@EndUserText.label : 'Draft table for entity ZI_PARTNER'
+@AbapCatalog.enhancement.category : #EXTENSIBLE_ANY
+@AbapCatalog.tableCategory : #TRANSPARENT
+@AbapCatalog.deliveryClass : #A
+@AbapCatalog.dataMaintenance : #RESTRICTED         
+define table zab_dpartner {
+
+  key partner   : int4 not null;
+  key draftuuid : sdraft_uuid not null;
+  name          : char13;
+  phonenumber   : /dmo/phone_number;
+  street        : char13;
+  city          : /dmo/city;
+  countrycode   : land1;
+  paycurr       : /dmo/currency_code;
+  lastchangedat : timestampl;
+  "%admin"      : include sych_bdl_draft_admin_inc;
+
+}
