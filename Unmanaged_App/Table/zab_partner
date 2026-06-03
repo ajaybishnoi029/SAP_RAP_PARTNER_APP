@@ -13,5 +13,8 @@ define table zab_partner {
   country_code    : land1;
   pay_curr        : /dmo/currency_code;
   last_changed_at : timestampl;
+  lastchangedby   : abp_locinst_lastchange_user;
+  createdat       : abp_creation_tstmpl;
+  createdby       : abp_creation_user;
 
 }
