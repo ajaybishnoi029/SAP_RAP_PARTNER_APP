@@ -2,7 +2,7 @@
 @AbapCatalog.enhancement.category : #EXTENSIBLE_ANY
 @AbapCatalog.tableCategory : #TRANSPARENT
 @AbapCatalog.deliveryClass : #A
-@AbapCatalog.dataMaintenance : #RESTRICTED         
+@AbapCatalog.dataMaintenance : #RESTRICTED
 define table zab_dpartner {
 
   key partner   : int4 not null;
@@ -14,6 +14,9 @@ define table zab_dpartner {
   countrycode   : land1;
   paycurr       : /dmo/currency_code;
   lastchangedat : timestampl;
+  lastchangedby : abp_locinst_lastchange_user;
+  createdat     : abp_creation_tstmpl;
+  createdby     : abp_creation_user;
   "%admin"      : include sych_bdl_draft_admin_inc;
 
 }
