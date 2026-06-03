@@ -1,25 +1,44 @@
 managed implementation in class zbp_i_partner unique;
-strict ( 2 );
+strict;
+with draft;
 
 define behavior for zI_partner alias Partner
 implementation in class zbp_i_partner unique
 persistent table zab_partner
-lock master
+
+draft table zab_dpartner
+lock master total etag LastChangedAt
 authorization master ( instance )
-//etag master <field_name>
+late numbering              // To define Late numbering
+
+etag master LastChangedAt
 {
   create ( authorization : global );
   update;
   delete;
-  //  field ( readonly ) Partner;
+
+  field ( readonly ) Partner;                             // As we using Late Numbering , then making Partner number read only
+
+
+  draft action Resume;
+  draft action Edit;
+  draft action Activate;
+  draft action Discard;
+
+  draft determine action Prepare
+    {
+    validation validateKeyIsFilled;
+    validation validateFieldData;
+  }
+
   validation validateKeyIsFilled on save { create; }
   validation validateFieldData on save { field CountryCode, PayCurr; }
 
-  action fillEmptyCountry;                  // Initially inactive and Active When Records Selected
+  action fillEmptyCountry;                                 // Initially inactive and Active When Records Selected
 
-  static action clearAllEmptyStreets;       // Always active and not dependent on a selected data record.
+  static action clearAllEmptyStreets;                      // Always active and not dependent on a selected data record.
 
-  static action withpopup parameter ZAB_i_POPUPENTITY ;     // Popup With Paramter( Abstract CDS View)
+  static action withpopup parameter ZAB_i_POPUPENTITY;     // Popup With Paramter( Abstract CDS View)
 
   mapping for zab_partner
     {
@@ -30,5 +49,6 @@ authorization master ( instance )
       City        = city;
       CountryCode = country_code;
       PayCurr     = pay_curr;
+      LastChangedAt = last_changed_at ;
     }
 }
