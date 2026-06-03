@@ -6,6 +6,8 @@ typeNamePlural: 'Partners'
   }
    }
 
+@UI.headerInfo.title: { type: #STANDARD, value: 'Partner' }
+
 annotate entity zc_partner with
 {
   @UI.facet      : [
@@ -33,7 +35,7 @@ annotate entity zc_partner with
        ]
 
   @UI.selectionField : [ { position: 10 } ]
-  
+
   @UI.lineItem: [{ position: 10, importance: #MEDIUM },
   { position: 10, type: #FOR_ACTION, label: 'Fill', dataAction: 'fillEmptyCountry' },
   { position: 20, type: #FOR_ACTION, label: 'Clear All', dataAction: 'clearAllEmptyStreets' },
@@ -75,5 +77,6 @@ annotate entity zc_partner with
   @UI.identification: [{ position: 40, qualifier: 'PARTNER_ADDRESS' }]
   @Consumption.valueHelpDefinition: [{  entity: {  name: 'I_CurrencyStdVH',   element: 'Currency'  } } ]
   PayCurr;
-
+  @EndUserText.label: 'Last Changed At'  
+  LastChangedAt;
 }
