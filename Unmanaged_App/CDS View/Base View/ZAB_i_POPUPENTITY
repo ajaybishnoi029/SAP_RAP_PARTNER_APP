@@ -1,0 +1,25 @@
+@EndUserText.label: 'Popup entity for Partner'
+define abstract entity ZAB_i_POPUPENTITY
+{
+  //  @EndUserText.label: 'Partner Number  1'
+  //  @UI.hidden: true
+  //  partner      : int4;
+  @EndUserText.label: 'Partner Name'
+  name         : char13;
+  @EndUserText.label: 'Phone Number'
+  phone_number : /dmo/phone_number;
+  @EndUserText.label: 'Street'
+  street       : char13;
+  @EndUserText.label: 'City'
+  city         : /dmo/city;
+  @EndUserText.label: 'Country Code'
+  @Consumption.valueHelpDefinition: [{ entity: {
+      name     : 'ZAB_C_COUNTRYVH',
+      element  : 'Country'
+  } }]
+
+  country_code : land1;
+  @EndUserText.label: 'Payment Currency'
+  pay_curr     : /dmo/currency_code;
+
+}
