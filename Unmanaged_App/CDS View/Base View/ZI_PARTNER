@@ -4,11 +4,15 @@
 define root view entity zI_partner
   as select from zab_partner
 {
-  key partner      as Partner,
-      name         as Name,
-      phone_number as PhoneNumber,
-      street       as Street,
-      city         as City,
-      country_code as CountryCode,
-      pay_curr     as PayCurr
+  key partner         as Partner,
+      name            as Name,
+      phone_number    as PhoneNumber,
+      street          as Street,
+      city            as City,
+      country_code    as CountryCode,
+      pay_curr        as PayCurr,
+      last_changed_at as LastChangedAt,
+      lastchangedby   as LastChangedBy,
+      createdat       as CreatedAt,
+      createdby       as CreatedBy
 }
