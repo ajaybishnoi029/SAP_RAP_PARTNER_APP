@@ -1,12 +1,19 @@
 projection;
-strict ( 2 );
-
+strict ;
+use draft ;
 define behavior for zc_partner alias Partner
 {
   use create;
   use update;
   use delete;
+
   use action fillEmptyCountry;
   use action clearAllEmptyStreets;
   use action withpopup;
+
+  use action Edit;
+  use action Activate;
+  use action Discard;
+  use action Prepare;
+  use action Resume;
 }
