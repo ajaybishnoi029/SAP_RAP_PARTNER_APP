@@ -11,6 +11,9 @@ define root view entity zc_partner
       Street,
       City,
       CountryCode,
-      PayCurr
+      PayCurr,
+      LastChangedAt,
+      LastChangedBy,
+      CreatedAt,
+      CreatedBy
 }
- 
