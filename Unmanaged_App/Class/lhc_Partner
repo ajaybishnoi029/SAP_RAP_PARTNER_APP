@@ -1,3 +1,34 @@
+*-----------------CLASS - LOCAL TYPE ------------------------------------------
+
+CLASS lsc_zi_partner DEFINITION INHERITING FROM cl_abap_behavior_saver.
+
+  PROTECTED SECTION.
+
+    METHODS adjust_numbers REDEFINITION.
+
+ENDCLASS.
+
+CLASS lsc_zi_partner IMPLEMENTATION.
+
+  METHOD adjust_numbers.
+
+    SELECT FROM zI_partner
+    FIELDS MAX( partner )
+    INTO @DATA(lv_max_partner).
+
+    LOOP AT mapped-partner REFERENCE INTO DATA(lr_partner).        "Automatic Key Getting
+      lv_max_partner += 1.
+      lr_partner->Partner = lv_max_partner.
+    ENDLOOP.
+
+
+  ENDMETHOD.
+
+ENDCLASS.
+
+
+
+
 CLASS lhc_Partner DEFINITION INHERITING FROM cl_abap_behavior_handler.
   PRIVATE SECTION.
 
@@ -18,6 +49,7 @@ CLASS lhc_Partner DEFINITION INHERITING FROM cl_abap_behavior_handler.
 
     METHODS clearAllEmptyStreets FOR MODIFY
       IMPORTING keys FOR ACTION Partner~clearAllEmptyStreets.
+
     METHODS withpopup FOR MODIFY
       IMPORTING keys FOR ACTION Partner~withpopup.
 
@@ -35,14 +67,14 @@ CLASS lhc_Partner IMPLEMENTATION.
 
   METHOD validateKeyIsFilled.
 
-    LOOP AT keys INTO DATA(ls_key) WHERE Partner IS INITIAL.
-      INSERT VALUE #( Partner = ls_key-Partner ) INTO TABLE failed-partner.
-
-      INSERT VALUE #(
-        Partner = ls_key-Partner
-         %msg = new_message_with_text( severity = if_abap_behv_message=>severity-error text = 'PartnerNumber is mandatory BY AJAY' )
-      ) INTO TABLE reported-partner.
-    ENDLOOP.
+*    LOOP AT keys INTO DATA(ls_key) WHERE Partner IS INITIAL.
+*      INSERT VALUE #( Partner = ls_key-Partner ) INTO TABLE failed-partner.
+*
+*      INSERT VALUE #(
+*        Partner = ls_key-Partner
+*         %msg = new_message_with_text( severity = if_abap_behv_message=>severity-error text = 'PartnerNumber is mandatory BY AJAY' )
+*      ) INTO TABLE reported-partner.
+*    ENDLOOP.
 
   ENDMETHOD.
 
@@ -122,7 +154,7 @@ CLASS lhc_Partner IMPLEMENTATION.
      FAILED DATA(ls_failed1)
      REPORTED DATA(ls_reported1).
 
-    LOOP AT   lt_partner_data1 INTO DATA(ls_pdata1) WHERE Partner IS NOT INITIAL  .
+    LOOP AT   lt_partner_data1 INTO DATA(ls_pdata1) WHERE Partner IS NOT INITIAL.
       INSERT VALUE #(
              partner = ls_pdata1-Partner
              %msg = new_message_with_text(
@@ -155,7 +187,7 @@ CLASS lhc_Partner IMPLEMENTATION.
            partner = '1'
            %msg = new_message_with_text(
                     severity = if_abap_behv_message=>severity-warning
-                    text     = |Not Good, I Know You Clicked on Clear All Button :(|
+                    text     = |I Know You Clicked on Clear All Button :(|
                   )
        ) INTO TABLE reported-partner.
 *    ENDLOOP.
@@ -172,14 +204,12 @@ CLASS lhc_Partner IMPLEMENTATION.
     it_partner_popup = VALUE #(
     (
     %cid = ls_keys-%cid
-    Partner =  ls_keys-%param-partner
     Name = ls_keys-%param-name
     PhoneNumber = ls_keys-%param-phone_number
     Street = ls_keys-%param-street
     city = ls_keys-%param-city
     CountryCode = ls_keys-%param-country_code
     PayCurr = ls_keys-%param-pay_curr
-    %control-Partner = if_abap_behv=>mk-on
     %control-Name = if_abap_behv=>mk-on
     %control-PhoneNumber = if_abap_behv=>mk-on
     %control-Street = if_abap_behv=>mk-on
@@ -189,11 +219,11 @@ CLASS lhc_Partner IMPLEMENTATION.
     )
        ) .
 
-  MODIFY ENTITIES OF zi_Partner ENTITY Partner
-  CREATE FROM it_partner_popup
-  FAILED DATA(ls_failed_ins)
-  MAPPED DATA(ls_mapped_ins)
-  REPORTED DATA(ls_reported_ins).
+    MODIFY ENTITIES OF zi_Partner ENTITY Partner
+    CREATE FROM it_partner_popup
+    FAILED DATA(ls_failed_ins)
+    MAPPED DATA(ls_mapped_ins)
+    REPORTED DATA(ls_reported_ins).
 
     IF ls_mapped_ins IS NOT INITIAL.
       INSERT VALUE #(
